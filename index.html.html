@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>GlowUp Cosmetics - Tienda Oficial</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">  
+
+    <!-- Font Awesome (Iconos) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #faf7f5; 
+            color: #4a3e40; 
+            overflow-x: hidden;
+        }
+        .bg-primary, .btn-primary {
+            background-color: #e8c5c8 !important; 
+            border-color: #e8c5c8 !important;
+        }
+        .btn-primary:hover {
+            background-color: #d6b2b5 !important;
+            border-color: #d6b2b5 !important;
+        }
+        .text-primary {
+            color: #c48b91 !important; 
+        }
+        .bg-dark {
+            background-color: #f2e6e6 !important; 
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: #6e5d60 !important;
+            font-weight: 500;
+        }
+        .navbar-dark .navbar-nav .nav-link:hover, .navbar-dark .navbar-nav .nav-link.active {
+            color: #c48b91 !important;
+        }
+        .bg-secondary {
+            background-color: #f7ebe9 !important; 
+        }
+        .product-item {
+            border-radius: 8px; 
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(196, 139, 145, 0.08);
+            transition: transform 0.3s;
+            background: #ffffff !important;
+            border: 1px solid #f2e6e6;
+            margin-bottom: 30px;
+        }
+        .product-item:hover {
+            transform: translateY(-5px);
+        }
+        .img-container {
+            height: 220px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 10px;
+        }
+        .img-cover {
+            object-fit: contain;
+            width: 100%;
+            height: 100%;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .section-padding {
+            padding-top: 80px; 
+            padding-bottom: 20px;
+        }
+        .badge-danger {
+            background-color: #c48b91 !important;
+        }
+
+        /* --- Panel Lateral del Carrito (Sidebar) --- */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px; 
+            width: 380px;
+            height: 100%;
+            background-color: #fff;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            z-index: 1050;
+            transition: right 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-sidebar.open {
+            right: 0; 
+        }
+        .cart-header {
+            padding: 20px;
+            background-color: #f2e6e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-body {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .cart-footer {
+            padding: 20px;
+            background-color: #faf7f5;
+            border-top: 1px solid #f2e6e6;
+        }
+        .cart-item-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #faf7f5;
+        }
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 1040;
+            display: none;
+        }
+        .cart-overlay.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Fondo opaco para el carrito -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+    <!-- Carrito Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h5 class="m-0 font-weight-bold" style="color: #6e5d60;"><i class="fas fa-shopping-bag mr-2"></i>Tu Bolsa de Compra</h5>
+            <button class="btn btn-sm btn-light" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-body" id="cartItemsContainer">
+            <p class="text-muted text-center my-4" id="emptyCartMessage">Tu bolsa está vacía.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="font-weight-bold">Total:</span>
+                <span class="font-weight-bold text-primary h5 m-0" id="cartTotalText">Q0.00</span>
+            </div>
+            <button class="btn btn-primary btn-block text-white font-weight-bold py-2" onclick="procesarPago()">PROCESAR PAGO</button>
+        </div>
+    </div>
+
+    <!-- Topbar -->
+    <div class="container-fluid" id="inicio">
+        <div class="row bg-secondary py-2 px-xl-5 align-items-center">
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="d-inline-flex align-items-center h-100 text-muted" style="font-size: 13px;">
+                    <span class="mr-3"><i class="fa fa-envelope mr-2"></i>soporte@glowupcosmetics.com</span>
+                    <span><i class="fa fa-truck mr-2"></i>Envíos express a todo el país</span>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center text-lg-right">
+                <div class="d-inline-flex align-items-center">
+                    <span class="text-muted small">Garantía de Satisfacción Total</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row align-items-center bg-white py-3 px-xl-5">
+            <div class="col-lg-4 col-6">
+                <a href="#inicio" class="text-decoration-none">
+                    <span class="h1 text-uppercase text-white bg-primary px-3 py-1" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px; font-weight: 600;">Glow</span>
+                    <span class="h1 text-uppercase bg-dark px-3 py-1" style="color: #6e5d60 !important; border-top-right-radius: 4px; border-bottom-right-radius: 4px; font-weight: 600;">Up</span>
+                </a>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block">
+                <div class="input-group">
+                    <!-- Buscador con ID e ID de evento para que funcione en tiempo real -->
+                    <input type="text" id="productSearchInput" class="form-control" placeholder="Buscar productos, marcas y más..." style="border-color: #e8c5c8; font-size: 14px;" onkeyup="filtrarProductos()">
+                    <div class="input-group-append">
+                        <span class="input-group-text bg-primary text-white"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-6 text-right">
+                <button class="btn px-0 ml-3 text-primary position-relative" style="background: transparent; border: none;" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart fa-2x"></i>
+                    <span class="badge badge-pill badge-danger position-absolute" id="cartBadgeCount" style="top: -5px; right: -10px;">0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <div class="container-fluid bg-dark sticky-top shadow-sm">
+        <div class="row px-xl-5">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0">
+                    <div class="navbar-nav mr-auto py-0 flex-row style-scroll" style="overflow-x: auto; white-space: nowrap; max-width: 100%;">
+                        <a href="#inicio" class="nav-item nav-link active mr-3">Inicio</a>
+                        <a href="#labiales-sec" class="nav-item nav-link mr-3">Labiales</a>
+                        <a href="#sombras-sec" class="nav-item nav-link mr-3">Sombras</a>
+                        <a href="#correctores-sec" class="nav-item nav-link mr-3">Correctores</a>
+                        <a href="#sprays-sec" class="nav-item nav-link mr-3">Setting Sprays</a>
+                        <a href="#polvos-sec" class="nav-item nav-link mr-3">Polvos</a>
+                        <a href="#ubicacion-sec" class="nav-item nav-link mr-3">Ubicación</a>
+                        <a href="#contacto-sec" class="nav-item nav-link mr-3">Contacto</a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Banner -->
+    <div class="container-fluid mb-3 mt-3">
+        <div class="row px-xl-5">
+            <div class="col-lg-12">
+                <div class="position-relative bg-white rounded shadow-sm p-5 d-flex align-items-center" style="min-height: 380px; background: linear-gradient(rgba(250,247,255,0.4), rgba(250,247,255,0.4)), url('https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1200&auto=format&fit=crop') center center/cover;">
+                    <div class="p-3 bg-white rounded shadow-sm" style="max-width: 550px;">
+                        <h1 class="display-4 text-dark font-weight-bold mb-3" style="font-size: 2.2rem;">Resalta tu Belleza <span class="text-primary">Natural</span></h1>
+                        <p class="text-muted">Explora nuestra colección exclusiva de cosméticos premium de alta fidelidad, diseñados para cuidar tu piel mientras lucen espectaculares.</p>
+                        <a class="btn btn-primary text-white py-2 px-4 mt-2 font-weight-bold" href="#labiales-sec" style="border-radius: 4px;">Ver Colección</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN LABIALES ================= -->
+    <div id="labiales-sec" class="container-fluid section-padding target-section">
+        <h4 class="text-uppercase mx-xl-5 mb-4" style="letter-spacing: 1px; font-weight: 600;"><span class="border-bottom pb-2" style="border-color: #e8c5c8 !important;">Colección Labiales</span></h4>
+        <div class="row px-xl-5 product-grid">
+            
+            <!-- Labial 1 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiigaWwZ-0eTOV26bOgBAffISNBHGh3_Sg3xOpbIsqZw&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Lipstick Matte Velvet Rose</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q145.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l1', 'Lipstick Matte Velvet Rose', 145.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiigaWwZ-0eTOV26bOgBAffISNBHGh3_Sg3xOpbIsqZw&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 2 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp1sAxAbdYg292oB08-w96fQHzTEb-wSQFCYRLpS7y7w&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Glow Liquid Lip Gloss</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q210.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l2', 'Glow Liquid Lip Gloss', 210.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp1sAxAbdYg292oB08-w96fQHzTEb-wSQFCYRLpS7y7w&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 3 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGxGCzX9xCo_6MwoDgmARl5ODWa_COrfspAIupoeyUWQ&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Bálsamo Hidratante Soft Tint</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q120.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l3', 'Bálsamo Hidratante Soft Tint', 120.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGxGCzX9xCo_6MwoDgmARl5ODWa_COrfspAIupoeyUWQ&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 4 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7oDCOqYy1vox7WOTdwmkLooFJfzgcriq8wiyfVXHoig&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Labial Satinado Luxury Nude</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q340.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l4', 'Labial Satinado Luxury Nude', 340.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7oDCOqYy1vox7WOTdwmkLooFJfzgcriq8wiyfVXHoig&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 5 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnl4BdT595JUjlgt0-hk5X6Gzmx06cZnYkAi1aQCP3nw&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Lip Liner Precision Duo</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q180.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l5', 'Lip Liner Precision Duo', 180.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnl4BdT595JUjlgt0-hk5X6Gzmx06cZnYkAi1aQCP3nw&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 6 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlhY9vZ-kSr2nn7YWDucO9iuevKMzQ1MJTkYt0j7nNyQ&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Lip Plumper Volume Max</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q265.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l6', 'Lip Plumper Volume Max', 265.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlhY9vZ-kSr2nn7YWDucO9iuevKMzQ1MJTkYt0j7nNyQ&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 7 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYajsMjNOvOFpjDT00k9q4dny61bC8KYImwRm_hH_Y6A&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Tinta Labial Long Lasting Cherry</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q150.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l7', 'Tinta Labial Long Lasting Cherry', 150.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYajsMjNOvOFpjDT00k9q4dny61bC8KYImwRm_hH_Y6A&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 8 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqRmyXp7D2nRD5pqywiGpUY6OJYg6zY9IehUJtyPefIg&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Labial Cremoso Hydra Rich</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q195.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l8', 'Labial Cremoso Hydra Rich', 195.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:GcSqRmyXp7D2nRD5pqywiGpUY6OJYg6zY9IehUJtyPefIg&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 9 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzHyp8imDqVZGEiOklSh3xgYTBK2IgbUWtz-EI6x4Gug&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Set Lip Balm Essential Trío</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q420.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l9', 'Set Lip Balm Essential Trío', 420.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzHyp8imDqVZGEiOklSh3xgYTBK2IgbUWtz-EI6x4Gug&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 10 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_DPOXfYvAk17pnQF9eZd9JGU1KDt1_XsaClXiRpCTDQ&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Labial Líquido Waterproof No-Transfer</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q230.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l10', 'Labial Líquido Waterproof No-Transfer', 230.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_DPOXfYvAk17pnQF9eZd9JGU1KDt1_XsaClXiRpCTDQ&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Labial 11 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpXDIPDo2PnkNxrHxcAkp7zf63rQxJelCu2NgxYVtNVOHboG2evKGZ3hT1&s=10" alt="Labial">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Sheglam lip gloss</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q150.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l11', 'Sheglam lip gloss', 150.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpXDIPDo2PnkNxrHxcAkp7zf63rQxJelCu2NgxYVtNVOHboG2evKGZ3hT1&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 12 (NUEVO) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0eBc156iWsN4hXktspGo1imAddA-2LcU2PCpLeoseGQ&s=10" alt="YVES SAINT LAURENT">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">YVES SAINT LAURENT</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q400.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l12', 'YVES SAINT LAURENT', 400.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0eBc156iWsN4hXktspGo1imAddA-2LcU2PCpLeoseGQ&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 13 (NUEVO) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://s2.ppllstatics.com/mujerhoy/www/multimedia/202208/31/media/cortadas/Labiales-iconicos-Schiap-Nars-k5II--634x634@MujerHoy.jpeg" alt="NARS">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">NARS Labial</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q175.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l13', 'NARS Labial', 175.00, 'https://s2.ppllstatics.com/mujerhoy/www/multimedia/202208/31/media/cortadas/Labiales-iconicos-Schiap-Nars-k5II--634x634@MujerHoy.jpeg')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 14 (NUEVO) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://escuelademaquillajemadrid.com/wp-content/uploads/2024/02/Guerlain_pintalabios-mas-vendidos.jpg" alt="GUERLAIN">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">GUERLAIN Lujo</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q300.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l14', 'GUERLAIN Lujo', 300.00, 'https://escuelademaquillajemadrid.com/wp-content/uploads/2024/02/Guerlain_pintalabios-mas-vendidos.jpg')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 15 (NUEVO) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1660930900-12430021-3974743286253571.jpg?crop=1xw:1xh;center,top&resize=980:*" alt="LOREAL PARIS">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">LOREAL PARIS Color</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q75.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l15', 'LOREAL PARIS Color', 75.00, 'https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1660930900-12430021-3974743286253571.jpg?crop=1xw:1xh;center,top&resize=980:*')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 16 (NUEVO) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://peopleenespanol.com/thmb/b9l_5L4ykeLfJIDbzaxZPKQRBw4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/s1828102-main-lhero-526edf7f648342c4aa1dd341fa690bd1.jpg" alt="URBAN DECAY">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">URBAN DECAY Matt</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q95.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l16', 'URBAN DECAY Matt', 95.00, 'https://peopleenespanol.com/thmb/b9l_5L4ykeLfJIDbzaxZPKQRBw4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/s1828102-main-lhero-526edf7f648342c4aa1dd341fa690bd1.jpg')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labial 17 (NUEVO) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://www.rsvponline.mx/800x600/filters:format(jpg):quality(75)/files/rsvp/images/main/2024/labiales_de_lujo.jpg" alt="LAMER">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">LAMER Lip Luxury</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q220.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('l17', 'LAMER Lip Luxury', 220.00, 'https://www.rsvponline.mx/800x600/filters:format(jpg):quality(75)/files/rsvp/images/main/2024/labiales_de_lujo.jpg')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN SOMBRAS OJOS ================= -->
+    <div id="sombras-sec" class="container-fluid section-padding target-section">
+        <h4 class="text-uppercase mx-xl-5 mb-4" style="letter-spacing: 1px; font-weight: 600;"><span class="border-bottom pb-2" style="border-color: #e8c5c8 !important;">Colección Sombras de Ojos</span></h4>
+        <div class="row px-xl-5 product-grid">
+            
+            <!-- Sombras 1 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB4hHYSddpfhnCt5BX4idqUBEKH1qBiDcRZcYq94lgWg&s=10" alt="Sombras">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Paleta Essential Nudes 9 Tonos</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q290.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s1', 'Paleta Essential Nudes 9 Tonos', 290.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB4hHYSddpfhnCt5BX4idqUBEKH1qBiDcRZcYq94lgWg&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 2 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMFcMXEbnQ0RVGsR0mYQOEUwQDJrggIoTP4erk7VU1Pw&s=10" alt="Sombras">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Sombra Individual Metálica Shimmer</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q115.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s2', 'Sombra Individual Metálica Shimmer', 115.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMFcMXEbnQ0RVGsR0mYQOEUwQDJrggIoTP4erk7VU1Pw&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 3 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4_Pq4SHvC1F6uBiBropOHZR_F9-cz0kjbrpbHwHa-Mg&s=10" alt="Sombras">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Paleta Profesional Sunset Glitter</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q480.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s3', 'Paleta Profesional Sunset Glitter', 480.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4_Pq4SHvC1F6uBiBropOHZR_F9-cz0kjbrpbHwHa-Mg&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 4 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYyBYz65w3TrWtfoJ8a6RXRsjdJFz8U4DuaRZU78IwZQ&s=10" alt="Sombras">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Paleta Compacta Rose Gold</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q310.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s4', 'Paleta Compacta Rose Gold', 310.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYyBYz65w3TrWtfoJ8a6RXRsjdJFz8U4DuaRZU78IwZQ&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 5 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR04_LDPX2ELa9kot1ssqx5ec72aVnIgKTTIpLax6FHAw&s=10" alt="Sombras">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Sombra en Crema Satin Finish</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q165.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s5', 'Sombra en Crema Satin Finish', 165.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR04_LDPX2ELa9kot1ssqx5ec72aVnIgKTTIpLax6FHAw&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 6 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf8YiXZzHZpPhjfzH0ml-nJBY4-wI25F1JpGHmIDRp_g&s=10" alt="Sombras">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Paleta de Ojos smoky Glam</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q385.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s6', 'Paleta de Ojos smoky Glam', 385.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf8YiXZzHZpPhjfzH0ml-nJBY4-wI25F1JpGHmIDRp_g&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 7 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR70DpgsjHc77kedeOS7YArb_Dornwt8Ps1zTVcbfnIg&s=10" alt="Sombras">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Paleta Mate de Alta Pigmentación</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q260.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s7', 'Paleta Mate de Alta Pigmentación', 260.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR70DpgsjHc77kedeOS7YArb_Dornwt8Ps1zTVcbfnIg&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 8 (NUEVA) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1780913663-284f9c70-645b-46f4-a467-8c6377dd7565.jpg?crop=1xw:1xh;center,top&resize=980:*" alt="NARS">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">NARS Paleta Sombras</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q350.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s8', 'NARS Paleta Sombras', 350.00, 'https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1780913663-284f9c70-645b-46f4-a467-8c6377dd7565.jpg?crop=1xw:1xh;center,top&resize=980:*')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 9 (NUEVA) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1732558369-sombras-ojos-03-6744be041ed5a.jpg?crop=1.00xw:0.949xh;0,0.0277xh&resize=980:*" alt="GUERLAIN">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">GUERLAIN Sombras Quad</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q400.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s9', 'GUERLAIN Sombras Quad', 400.00, 'https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1732558369-sombras-ojos-03-6744be041ed5a.jpg?crop=1.00xw:0.949xh;0,0.0277xh&resize=980:*')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 10 (NUEVA) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://merymakeup.com/wp-content/uploads/2014/03/paleta-sombras-huda-beauty-nude-2.jpg" alt="NUDE">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">NUDE Paleta Huda</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q100.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s10', 'NUDE Paleta Huda', 100.00, 'https://merymakeup.com/wp-content/uploads/2014/03/paleta-sombras-huda-beauty-nude-2.jpg')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 11 (NUEVA) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1706438998-717sRzrIC0L.jpg?crop=1xw:1.00xh;center,top&resize=980:*" alt="NYX">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">NYX Professional Eyes</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q350.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s11', 'NYX Professional Eyes', 350.00, 'https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1706438998-717sRzrIC0L.jpg?crop=1xw:1.00xh;center,top&resize=980:*')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sombras 12 (NUEVA) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://sgfm.elcorteingles.es/SGFM/dctm/MEDIA03/202103/15/00113517379098____2__516x640.jpg" alt="CLINIQUE">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">CLINIQUE Eyeshadow</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q275.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('s12', 'CLINIQUE Eyeshadow', 275.00, 'https://sgfm.elcorteingles.es/SGFM/dctm/MEDIA03/202103/15/00113517379098____2__516x640.jpg')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN CORRECTORES ================= -->
+    <div id="correctores-sec" class="container-fluid section-padding target-section">
+        <h4 class="text-uppercase mx-xl-5 mb-4" style="letter-spacing: 1px; font-weight: 600;"><span class="border-bottom pb-2" style="border-color: #e8c5c8 !important;">Colección Correctores</span></h4>
+        <div class="row px-xl-5 product-grid">
+            
+            <!-- Corrector 1 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAc0RUXBAwSY7MIlBuDcksVtP3cx6WPO6-LI0DOhGoxQ&s=10" alt="Corrector">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Corrector Líquido Full Coverage</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q135.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('c1', 'Corrector Líquido Full Coverage', 135.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAc0RUXBAwSY7MIlBuDcksVtP3cx6WPO6-LI0DOhGoxQ&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Corrector 2 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSY7xvXB_5omIjdkdNGgrLEkBqYEIf2F-dxpaDCN2rrUQ&s=10" alt="Corrector">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">Corrector Iluminador Instant Glow</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q140.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('c2', 'Corrector Iluminador Instant Glow', 140.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSY7xvXB_5omIjdkdNGgrLEkBqYEIf2F-dxpaDCN2rrUQ&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN SETTING SPRAYS (NUEVA) ================= -->
+    <div id="sprays-sec" class="container-fluid section-padding target-section">
+        <h4 class="text-uppercase mx-xl-5 mb-4" style="letter-spacing: 1px; font-weight: 600;"><span class="border-bottom pb-2" style="border-color: #e8c5c8 !important;">Colección Setting Sprays</span></h4>
+        <div class="row px-xl-5 product-grid">
+
+            <!-- Spray 1 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKpCs6Xmp9LcJZuws6y4RGFYrdaQ06V1kEJswhZNJUtA&s=10" alt="ONE SIZE">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">ONE SIZE Setting Spray</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q350.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('sp1', 'ONE SIZE Setting Spray', 350.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKpCs6Xmp9LcJZuws6y4RGFYrdaQ06V1kEJswhZNJUtA&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spray 2 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://www.byrdie.com/thmb/TrJwWkuhwXOxcCzSkAWPC1QH98Q=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/byr-waterproof-setting-sprays-tout-71a7b905cc7d4528a65928ee3cbf6646.jpg" alt="CHARLOTTE TILBURY">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">CHARLOTTE TILBURY Spray</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q400.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('sp2', 'CHARLOTTE TILBURY Spray', 400.00, 'https://www.byrdie.com/thmb/TrJwWkuhwXOxcCzSkAWPC1QH98Q=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/byr-waterproof-setting-sprays-tout-71a7b905cc7d4528a65928ee3cbf6646.jpg')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spray 3 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://recipemakeupgt.com/cdn/shop/files/fbc25eaf-ELF-SPRAY.jpg?v=1753456821&width=747" alt="E.L.F">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">E.L.F. Cosmetics Mist</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q150.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('sp3', 'E.L.F. Cosmetics Mist', 150.00, 'https://recipemakeupgt.com/cdn/shop/files/fbc25eaf-ELF-SPRAY.jpg?v=1753456821&width=747')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spray 4 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzcr_oOym12Epm12EpM79O34RUti43Gh9oZZaq8OnJVyLQ2lHqeE0I1KyW3X4&s=10" alt="KYLIE COSMETICS">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">KYLIE COSMETICS Spray</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q250.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('sp4', 'KYLIE COSMETICS Spray', 250.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzcr_oOym12Epm12EpM79O34RUti43Gh9oZZaq8OnJVyLQ2lHqeE0I1KyW3X4&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spray 5 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://www.morphe.com/cdn/shop/files/M_ContinousSettingMistRedesign_CSM_Regular_US_PDP_Closed.jpg?v=1760634816&width=1920" alt="MORPHE">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">MORPHE Continuous Mist</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q300.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('sp5', 'MORPHE Continuous Mist', 300.00, 'https://www.morphe.com/cdn/shop/files/M_ContinousSettingMistRedesign_CSM_Regular_US_PDP_Closed.jpg?v=1760634816&width=1920')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spray 6 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHAbCKNTvfLW7IoQIzJNKOq8P3gP_GNIxWCr-o5arBWo53QnT_CO8VdMlI&s=10" alt="RARE BEAUTY">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">RARE BEAUTY Always Anew</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q400.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('sp6', 'RARE BEAUTY Always Anew', 400.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHAbCKNTvfLW7IoQIzJNKOq8P3gP_GNIxWCr-o5arBWo53QnT_CO8VdMlI&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spray 7 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://www.cultbeauty.com/images?url=https://static.thcdn.com/productimg/original/17378535-6075290367064921.jpg&format=webp&auto=avif&width=985&height=985&fit=cover" alt="SAIE">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">SAIE Glowy Mist</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q350.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('sp7', 'SAIE Glowy Mist', 350.00, 'https://www.cultbeauty.com/images?url=https://static.thcdn.com/productimg/original/17378535-6075290367064921.jpg&format=webp&auto=avif&width=985&height=985&fit=cover')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spray 8 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJZkC-P7XgaA4NrWfLzltvXaCFLju1-WKM5gkKQuPG-g&s" alt="NYX">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">NYX Matte Finish Spray</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q230.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('sp8', 'NYX Matte Finish Spray', 230.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJZkC-P7XgaA4NrWfLzltvXaCFLju1-WKM5gkKQuPG-g&s')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN POLVOS (NUEVA) ================= -->
+    <div id="polvos-sec" class="container-fluid section-padding target-section">
+        <h4 class="text-uppercase mx-xl-5 mb-4" style="letter-spacing: 1px; font-weight: 600;"><span class="border-bottom pb-2" style="border-color: #e8c5c8 !important;">Colección Polvos</span></h4>
+        <div class="row px-xl-5 product-grid">
+
+            <!-- Polvo 1 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfAQCaZUk3kDCNeTm9eBZB51RD1Ee1YlzpkIvS6E0enw&s=10" alt="AIRSPUN">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">AIRSPUN Loose Translucent</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q135.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('po1', 'AIRSPUN Loose Translucent', 135.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfAQCaZUk3kDCNeTm9eBZB51RD1Ee1YlzpkIvS6E0enw&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polvo 2 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmOcYCBpcBEn9Le1aL9CU4eWs-UIhux68iYVtyL8KaKw&s=10" alt="YUYA">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">YUYA Polvo Translúcido</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q130.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('po2', 'YUYA Polvo Translúcido', 130.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmOcYCBpcBEn9Le1aL9CU4eWs-UIhux68iYVtyL8KaKw&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polvo 3 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPd0r6iK3lJWmjVZ8uslIBpwdZAabbWUztFRvNowCo2g&s=10" alt="LBEL">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">LBEL Polvo Compacto</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q100.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('po3', 'LBEL Polvo Compacto', 100.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPd0r6iK3lJWmjVZ8uslIBpwdZAabbWUztFRvNowCo2g&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polvo 4 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTA9WpKi0xY0H5v7rvBVaX97naMWkbk6VuFmkUxJiW9xg&s=10" alt="HUDA BEAUTY">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">HUDA BEAUTY Easy Bake</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q500.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('po4', 'HUDA BEAUTY Easy Bake', 500.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTA9WpKi0xY0H5v7rvBVaX97naMWkbk6VuFmkUxJiW9xg&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polvo 5 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRld3mr59QVePgo54h5Y6meLzpTwTyugjueMaBh4MWyaQ&s=10" alt="LAURA MERCIER">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">LAURA MERCIER Setting Loose</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q300.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('po5', 'LAURA MERCIER Setting Loose', 300.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRld3mr59QVePgo54h5Y6meLzpTwTyugjueMaBh4MWyaQ&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polvo 6 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAKnLO5mZAU_6EZyGvot5NG68uISYAHeAtumQO7FGmAA&s=10" alt="ONE SIZE">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">ONE SIZE Turn Up Loose</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q350.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('po6', 'ONE SIZE Turn Up Loose', 350.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAKnLO5mZAU_6EZyGvot5NG68uISYAHeAtumQO7FGmAA&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polvo 7 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrCB4ocJAoM1KfxekXP6DEd3FxwNH6Jil-E9e9lJ_ZoA&s=10" alt="BEAUTY CREATIONS">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">BEAUTY CREATIONS Flawless</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q150.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('po7', 'BEAUTY CREATIONS Flawless', 150.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrCB4ocJAoM1KfxekXP6DEd3FxwNH6Jil-E9e9lJ_ZoA&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polvo 8 -->
+            <div class="col-lg-3 col-md-4 col-sm-6 product-card">
+                <div class="product-item">
+                    <div class="img-container">
+                        <img class="img-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwPJwEKVacaqjsEKHs9N_zcDD60QwYp9COug04RJfLxg&s=10" alt="BY MARIO">
+                    </div>
+                    <div class="text-center py-3 px-2">
+                        <span class="h6 font-weight-bold text-dark d-block text-truncate search-title" style="font-size: 14px;">MAKEUP BY MARIO Powder</span>
+                        <h5 class="text-primary font-weight-bold my-2" style="font-size: 16px;">Q275.00</h5>
+                        <button class="btn btn-sm btn-primary text-white w-100 font-weight-bold mt-2" onclick="agregarAlCarrito('po8', 'MAKEUP BY MARIO Powder', 275.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwPJwEKVacaqjsEKHs9N_zcDD60QwYp9COug04RJfLxg&s=10')">Añadir a la bolsa</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN UBICACIÓN DE LA TIENDA ================= -->
+    <div id="ubicacion-sec" class="container-fluid section-padding bg-light mt-5">
+        <h4 class="text-uppercase mx-xl-5 mb-4" style="letter-spacing: 1px; font-weight: 600;"><span class="border-bottom pb-2" style="border-color: #e8c5c8 !important;">Nuestra Ubicación</span></h4>
+        <div class="row px-xl-5 align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <h5 class="font-weight-bold mb-3" style="color: #6e5d60;">¡Visítanos en nuestra tienda física!</h5>
+                <p class="text-muted">Disfruta de una experiencia personalizada probando todos nuestros tonos y recibiendo asesoría directa de nuestras expertas en belleza cosmética.</p>
+                <ul class="list-unstyled text-muted pl-1" style="line-height: 2;">
+                    <li><i class="fas fa-map-marker-alt text-primary mr-2"></i> Calzada Roosevelt 13-45, Zona 11, Ciudad de Guatemala</li>
+                    <li><i class="fas fa-clock text-primary mr-2"></i> Lunes a Sábado: 9:00 AM - 8:00 PM</li>
+                    <li><i class="fas fa-phone-alt text-primary mr-2"></i> PBX: (+502) 2200-4400</li>
+                </ul>
+            </div>
+            <div class="col-lg-7">
+                <div class="rounded shadow-sm overflow-hidden bg-white p-2" style="border: 1px solid #f2e6e6; height: 350px;">
+                    <!-- Mapa Embebido de Google Maps de la ubicación física en Guatemala -->
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3860.9733055811776!2d-90.54878482420803!3d14.628994785863923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8589a19cc960f89d%3A0x6e0e02eb74f3df7a!2sCalzada%20Roosevelt%2C%20Ciudad%20de%20Guatemala!5e0!3m2!1ses-419!2sgt!4v1718000000000!5m2!1ses-419!2sgt" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN DE CONTACTANOS ================= -->
+    <!-- ================= SECCIÓN DE CONTACTO ================= -->
+    <div id="contacto-sec" class="container-fluid section-padding bg-white" style="border-top: 1px solid #f2e6e6;">
+        <div class="row px-xl-5">
+            <div class="col-lg-6 mx-auto">
+                <div class="p-4 rounded shadow-sm" style="background-color: #faf7f5; border: 1px solid #e8c5c8;">
+                    <h3 class="text-center font-weight-bold mb-4" style="color: #6e5d60;">Contáctanos</h3>
+                    <p class="text-muted text-center small mb-4">¿Tienes dudas o necesitas ayuda con tu orden? Escríbenos y nos pondremos en contacto contigo de inmediato.</p>
+                    
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label class="font-weight-600 small" style="color: #6e5d60;">Nombre Completo</label>
+                            <input type="text" id="user_name" class="form-control" placeholder="Ej. María López" style="border-color: #e8c5c8;" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-600 small" style="color: #6e5d60;">Correo Electrónico</label>
+                            <input type="email" id="user_email" class="form-control" placeholder="tu-correo@ejemplo.com" style="border-color: #e8c5c8;" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-600 small" style="color: #6e5d60;">Mensaje</label>
+                            <textarea id="message" class="form-control" rows="4" placeholder="Escribe aquí tu duda..." style="border-color: #e8c5c8;" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block text-white font-weight-bold py-2 mt-4">ENVIAR MENSAJE</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= LIBRERÍA DE EMAILJS ================= -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        let carrito = [];
+
+        // --- FUNCIÓN DEL BUSCADOR DINÁMICO ---
+        function filtrarProductos() {
+            const query = document.getElementById('productSearchInput').value.toLowerCase().trim();
+            const productCards = document.querySelectorAll('.product-card');
+
+            productCards.forEach(card => {
+                const titleText = card.querySelector('.search-title').innerText.toLowerCase();
+                
+                if (titleText.includes(query)) {
+                    card.style.display = ""; 
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cartSidebar');
+            const overlay = document.getElementById('cartOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        function agregarAlCarrito(id, nombre, precio, imgUrl) {
+            const productoExistente = carrito.find(item => item.id === id);
+
+            if (productoExistente) {
+                productoExistente.cantidad += 1;
+            } else {
+                carrito.push({
+                    id: id,
+                    nombre: nombre,
+                    precio: precio,
+                    imgUrl: imgUrl,
+                    cantidad: 1
+                });
+            }
+
+            actualizarInterfazCarrito();
+            
+            const sidebar = document.getElementById('cartSidebar');
+            if (!sidebar.classList.contains('open')) {
+                toggleCart();
+            }
+        }
+
+        function eliminarDelCarrito(id) {
+            carrito = carrito.filter(item => item.id !== id);
+            actualizarInterfazCarrito();
+        }
+
+        function cambiarCantidad(id, cambio) {
+            const producto = carrito.find(item => item.id === id);
+            if (producto) {
+                producto.cantidad += cambio;
+                if (producto.cantidad <= 0) {
+                    eliminarDelCarrito(id);
+                } else {
+                    actualizarInterfazCarrito();
+                }
+            }
+        }
+
+        function actualizarInterfazCarrito() {
+            const container = document.getElementById('cartItemsContainer');
+            const emptyMessage = document.getElementById('emptyCartMessage');
+            const badgeCount = document.getElementById('cartBadgeCount');
+            const totalText = document.getElementById('cartTotalText');
+
+            container.innerHTML = '';
+
+            if (carrito.length === 0) {
+                container.appendChild(emptyMessage);
+                badgeCount.innerText = '0';
+                totalText.innerText = 'Q0.00';
+                return;
+            }
+
+            let totalAcumulado = 0;
+            let totalArticulos = 0;
+
+            carrito.forEach(item => {
+                totalArticulos += item.cantidad;
+                totalAcumulado += (item.precio * item.cantidad);
+
+                const itemRow = document.createElement('div');
+                itemRow.className = 'cart-item-row';
+                itemRow.innerHTML = `
+                    <img src="${item.imgUrl}" alt="${item.nombre}" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid #f2e6e6; padding: 2px; margin-right: 12px; border-radius: 4px;">
+                    <div style="flex-grow: 1; min-width: 0;">
+                        <h6 class="m-0 text-truncate font-weight-bold" style="font-size: 13px; color: #4a3e40;">${item.nombre}</h6>
+                        <span class="text-primary small font-weight-bold">Q${item.precio.toFixed(2)}</span>
+                        <div class="d-flex align-items-center mt-1">
+                            <button class="btn btn-xs btn-light py-0 px-2" style="font-size: 10px; border: 1px solid #ddd;" onclick="cambiarCantidad('${item.id}', -1)">-</button>
+                            <span class="mx-2 small font-weight-bold">${item.cantidad}</span>
+                            <button class="btn btn-xs btn-light py-0 px-2" style="font-size: 10px; border: 1px solid #ddd;" onclick="cambiarCantidad('${item.id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm text-danger ml-2" style="background:transparent; border:none;" onclick="eliminarDelCarrito('${item.id}')"><i class="fas fa-trash-alt"></i></button>
+                `;
+                container.appendChild(itemRow);
+            });
+
+            badgeCount.innerText = totalArticulos;
+            totalText.innerText = `Q${totalAcumulado.toFixed(2)}`;
+        }
+
+        function procesarPago() {
+            if (carrito.length === 0) {
+                alert("Tu bolsa está vacía actualmente.");
+                return;
+            }
+            alert("¡Redirigiendo de forma segura a la pasarela de pago local en Quetzales!");
+            carrito = [];
+            actualizarInterfazCarrito();
+            toggleCart();
+        }
+
+        // --- INTERCEPCIÓN DEL FORMULARIO CON ENVÍO DIRECTO ---
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const btn = this.querySelector('button');
+            btn.innerText = 'ENVIANDO...';
+            btn.disabled = true;
+
+            // Recolectamos los datos directamente de los inputs
+            const templateParams = {
+                user_name: document.getElementById('user_name').value,
+                user_email: document.getElementById('user_email').value,
+                message: document.getElementById('message').value
+            };
+
+            
+            const serviceID = 'service_yl0iyg7'; 
+            const templateID = 'template_81hcfyf';
+            const publicKey = '0K3qgRo4qIlbCiQEx'; 
+
+            // Método de envío directo para evitar el error 404/400
+            emailjs.send(serviceID, templateID, templateParams, publicKey)
+                .then(function() {
+                    alert('¡Mensaje enviado con éxito! Nos comunicaremos contigo pronto.');
+                    document.getElementById('contact-form').reset();
+                    btn.innerText = 'ENVIAR MENSAJE';
+                    btn.disabled = false;
+                }, function(error) {
+                    alert('Ups, hubo un error al enviar el mensaje: ' + JSON.stringify(error));
+                    btn.innerText = 'ENVIAR MENSAJE';
+                    btn.disabled = false;
+                });
+        });
+    </script>
+
+    <!-- Bootstrap Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
